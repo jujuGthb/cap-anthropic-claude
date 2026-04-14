@@ -27,8 +27,6 @@ class ObjectDetectionExecutor(Capsule):
         self.request.model = PackageModel(**(self.request.data))
 
         self.classes = self.request.get_param("inputClasses")
-        self.enable_prompt = self.request.get_param("enablePrompt")
-        self.prompt = self.request.get_param("inputPrompt")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
         print(f"[DEBUG] Full api_key received: '{self.api_key}'")
@@ -47,7 +45,7 @@ class ObjectDetectionExecutor(Capsule):
 
     def _build_payload(self, base64_image):
         serialised_classes = ", ".join(self.classes) if isinstance(self.classes, list) else (self.classes or "")
-        default_system = (
+        system_prompt = (
             'You act as an object-detection model. You must provide reasonable predictions. '
             'You are only allowed to produce a JSON document. '
             'Expected structure: {"detections": [{"x_min": 0.1, "y_min": 0.2, "x_max": 0.3, "y_max": 0.4, '
@@ -55,7 +53,6 @@ class ObjectDetectionExecutor(Capsule):
             'All coordinates must be in range 0.0-1.0 as a proportion of image dimensions. '
             'Detect all instances of the provided classes.'
         )
-        system_prompt = self.prompt if self.enable_prompt and self.prompt else default_system
 
         payload = {
             "model": self.model_version,

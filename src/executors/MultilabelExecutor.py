@@ -29,8 +29,6 @@ class MultiLabelExecutor(Capsule):
         self.classes = self.request.get_param("inputClasses")
         print(f"[DEBUG] classes type: {type(self.classes)}")
         print(f"[DEBUG] classes value: {self.classes}")
-        self.enable_prompt = self.request.get_param("enablePrompt")
-        self.prompt = self.request.get_param("inputPrompt")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
         print(f"[DEBUG] Full api_key received: '{self.api_key}'")
@@ -49,13 +47,12 @@ class MultiLabelExecutor(Capsule):
 
     def _build_payload(self, base64_image):
         serialised_classes = ", ".join(self.classes) if isinstance(self.classes, list) else (self.classes or "")
-        default_system = (
+        system_prompt = (
             'You act as a multi-label classification model. You must provide reasonable predictions. '
             'You are only allowed to produce a JSON document. '
             'Expected structure: {"predicted_classes": [{"class": "class-name-1", "confidence": 0.9}]}. '
             'Only include classes that are visible in the image.'
         )
-        system_prompt = self.prompt if self.enable_prompt and self.prompt else default_system
 
         payload = {
             "model": self.model_version,

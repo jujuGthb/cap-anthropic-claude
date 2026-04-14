@@ -27,8 +27,6 @@ class ClassificationExecutor(Capsule):
         self.request.model = PackageModel(**(self.request.data))
 
         self.classes = self.request.get_param("inputClasses")
-        self.enable_prompt = self.request.get_param("enablePrompt")
-        self.prompt = self.request.get_param("inputPrompt")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
         print(f"[DEBUG] Full api_key received: '{self.api_key}'")
@@ -47,14 +45,13 @@ class ClassificationExecutor(Capsule):
 
     def _build_payload(self, base64_image):
         serialised_classes = ", ".join(self.classes) if isinstance(self.classes, list) else (self.classes or "")
-        default_system = (
+        system_prompt = (
             'You act as a single-class classification model. You must provide reasonable predictions. '
             'You are only allowed to produce a JSON document. '
             'Expected structure: {"class_name": "class-name", "confidence": 0.9}. '
             '`class-name` must be one of the classes defined by the user. '
             'Return a single JSON object only, no list.'
         )
-        system_prompt = self.prompt if self.enable_prompt and self.prompt else default_system
 
         payload = {
             "model": self.model_version,

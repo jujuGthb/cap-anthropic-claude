@@ -25,8 +25,6 @@ class DetailedCaptionExecutor(Capsule):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
 
-        self.enable_prompt = self.request.get_param("enablePrompt")
-        self.prompt = self.request.get_param("inputPrompt")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
         print(f"[DEBUG] Full api_key received: '{self.api_key}'")
@@ -44,12 +42,11 @@ class DetailedCaptionExecutor(Capsule):
         return {}
 
     def _build_payload(self, base64_image):
-        default_system = (
+        system_prompt = (
             "You act as an image caption model. "
             "Provide an extensive and detailed description of the image, "
             "including objects, colors, spatial relationships, and context."
         )
-        system_prompt = self.prompt if self.enable_prompt and self.prompt else default_system
 
         payload = {
             "model": self.model_version,

@@ -25,8 +25,6 @@ class CaptionExecutor(Capsule):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
 
-        self.enable_prompt = self.request.get_param("enablePrompt")
-        self.prompt = self.request.get_param("inputPrompt")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
         print(f"[DEBUG] Full api_key received: '{self.api_key}'")
@@ -44,8 +42,7 @@ class CaptionExecutor(Capsule):
         return {}
 
     def _build_payload(self, base64_image):
-        default_system = "You act as an image caption model. Provide a short, concise description of the image."
-        system_prompt = self.prompt if self.enable_prompt and self.prompt else default_system
+        system_prompt = "You act as an image caption model. Provide a short, concise description of the image."
 
         payload = {
             "model": self.model_version,
