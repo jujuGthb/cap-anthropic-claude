@@ -779,6 +779,6 @@ class PackageConfigs(Configs):
 
 
 class PackageModel(Package):
-    name: Literal["AthropicClaude"] = "AthropicClaude"
+    name: Literal["AnthropicClaude"] = "AnthropicClaude"
     configs: PackageConfigs
     type: Literal["capsule"] = "capsule"

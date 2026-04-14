@@ -4,20 +4,23 @@ Anthropic Claude Executor: Sends data to Anthropic's API and returns AI analysis
 
 import os
 import sys
+import base64
 import requests
+import cv2
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 
+from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.capsule import Capsule
 from sdks.novavision.src.helper.executor import Executor
-from capsules.AnthropicClaude.src.utils.response import build_response_text_prompt
+from capsules.AnthropicClaude.src.utils.response import build_response_structured_answering
 from capsules.AnthropicClaude.src.models.PackageModel import PackageModel
 
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 
 
-class TextPromptExecutor(Capsule):
+class StructuredAnsweringExecutor(Capsule):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
@@ -33,17 +36,37 @@ class TextPromptExecutor(Capsule):
         self.temperature = self.request.get_param("inputTemperature")
         self.max_tokens = self.request.get_param("maxTokens") or 3000
         self.max_concurrent_requests = self.request.get_param("maxConcurrentRequests")
+        self.image_selector = self.request.get_param("inputImage")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
         return {}
 
-    def _build_payload(self):
+    def _build_payload(self, base64_image):
         payload = {
             "model": self.model_version,
             "max_tokens": self.max_tokens,
+            "system": (
+                "You are supposed to produce responses in JSON. "
+                "The user will provide a dictionary where keys are field names and values are descriptions. "
+                "Every key must be present in your response. "
+                "Provide only the JSON object in your response, nothing else."
+            ),
             "messages": [
-                {"role": "user", "content": self.prompt}
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/jpeg",
+                                "data": base64_image,
+                            },
+                        },
+                        {"type": "text", "text": f"Output structure specification:\n{self.prompt}"},
+                    ],
+                }
             ],
         }
 
@@ -56,7 +79,14 @@ class TextPromptExecutor(Capsule):
         return payload
 
     def run(self):
-        payload = self._build_payload()
+        img = Image.get_frame(img=self.image_selector, redis_db=self.redis_db)
+
+        success, encoded_image = cv2.imencode('.jpg', img.value)
+        if not success:
+            raise RuntimeError("Failed to encode image for API")
+
+        base64_image = base64.b64encode(encoded_image).decode('utf-8')
+        payload = self._build_payload(base64_image)
 
         try:
             if self.api_provider == "NovaVision":
@@ -109,7 +139,7 @@ class TextPromptExecutor(Capsule):
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
-        return build_response_text_prompt(context=self)
+        return build_response_structured_answering(context=self)
 
 
 if "__main__" == __name__:

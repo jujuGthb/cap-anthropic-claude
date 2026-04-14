@@ -4,24 +4,30 @@ Anthropic Claude Executor: Sends data to Anthropic's API and returns AI analysis
 
 import os
 import sys
+import base64
+import json
 import requests
+import cv2
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 
+from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.capsule import Capsule
 from sdks.novavision.src.helper.executor import Executor
-from capsules.AnthropicClaude.src.utils.response import build_response_text_prompt
+from capsules.AnthropicClaude.src.utils.response import build_response_classification
 from capsules.AnthropicClaude.src.models.PackageModel import PackageModel
 
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 
 
-class TextPromptExecutor(Capsule):
+class ClassificationExecutor(Capsule):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
 
+        self.classes = self.request.get_param("inputClasses")
+        self.enable_prompt = self.request.get_param("enablePrompt")
         self.prompt = self.request.get_param("inputPrompt")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
@@ -33,17 +39,42 @@ class TextPromptExecutor(Capsule):
         self.temperature = self.request.get_param("inputTemperature")
         self.max_tokens = self.request.get_param("maxTokens") or 3000
         self.max_concurrent_requests = self.request.get_param("maxConcurrentRequests")
+        self.image_selector = self.request.get_param("inputImage")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
         return {}
 
-    def _build_payload(self):
+    def _build_payload(self, base64_image):
+        serialised_classes = ", ".join(self.classes) if isinstance(self.classes, list) else (self.classes or "")
+        default_system = (
+            'You act as a single-class classification model. You must provide reasonable predictions. '
+            'You are only allowed to produce a JSON document. '
+            'Expected structure: {"class_name": "class-name", "confidence": 0.9}. '
+            '`class-name` must be one of the classes defined by the user. '
+            'Return a single JSON object only, no list.'
+        )
+        system_prompt = self.prompt if self.enable_prompt and self.prompt else default_system
+
         payload = {
             "model": self.model_version,
             "max_tokens": self.max_tokens,
+            "system": system_prompt,
             "messages": [
-                {"role": "user", "content": self.prompt}
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/jpeg",
+                                "data": base64_image,
+                            },
+                        },
+                        {"type": "text", "text": f"List of classes: {serialised_classes}"},
+                    ],
+                }
             ],
         }
 
@@ -56,7 +87,14 @@ class TextPromptExecutor(Capsule):
         return payload
 
     def run(self):
-        payload = self._build_payload()
+        img = Image.get_frame(img=self.image_selector, redis_db=self.redis_db)
+
+        success, encoded_image = cv2.imencode('.jpg', img.value)
+        if not success:
+            raise RuntimeError("Failed to encode image for API")
+
+        base64_image = base64.b64encode(encoded_image).decode('utf-8')
+        payload = self._build_payload(base64_image)
 
         try:
             if self.api_provider == "NovaVision":
@@ -98,7 +136,12 @@ class TextPromptExecutor(Capsule):
             )
             if not self.claude_text:
                 raise ValueError("Claude API returned no text content in response.")
-            self.claude_classes = []
+            try:
+                parsed = json.loads(self.claude_text)
+                class_name = parsed.get("class_name", "")
+                self.claude_classes = [class_name] if class_name else []
+            except (json.JSONDecodeError, KeyError):
+                self.claude_classes = []
 
         except requests.exceptions.HTTPError as e:
             self.claude_text = f"HTTP Error {response.status_code}: {response.text}"
@@ -109,7 +152,7 @@ class TextPromptExecutor(Capsule):
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
-        return build_response_text_prompt(context=self)
+        return build_response_classification(context=self)
 
 
 if "__main__" == __name__:

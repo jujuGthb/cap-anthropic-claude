@@ -1,5 +1,5 @@
 from sdks.novavision.src.helper.package import PackageHelper
-from capsules.Claude.src.models.PackageModel import (
+from capsules.AnthropicClaude.src.models.PackageModel import (
     PackageModel,
     PackageConfigs,
     ConfigExecutor,
