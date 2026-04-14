@@ -62,7 +62,11 @@ class InputPrompt(Config):
 
 
 class EnablePromptTrue(Config):
+    """
+    When selected, the Prompt field below will be shown and used as the system instruction.
+    """
     name: Literal["True"] = "True"
+    inputPrompt: InputPrompt
     value: Literal[True] = True
     type: Literal["bool"] = "bool"
     field: Literal["option"] = "option"
@@ -72,6 +76,9 @@ class EnablePromptTrue(Config):
 
 
 class EnablePromptFalse(Config):
+    """
+    When selected, the executor uses its built-in default system prompt.
+    """
     name: Literal["False"] = "False"
     value: Literal[False] = False
     type: Literal["bool"] = "bool"
@@ -85,12 +92,12 @@ class EnablePrompt(Config):
     """
     Enable a custom text prompt to override the default system instruction.
     When disabled, the executor uses its built-in default prompt.
-    When enabled, the Prompt field below will be used instead.
+    When enabled, the Prompt field will appear and be used instead.
     """
     name: Literal["enablePrompt"] = "enablePrompt"
     value: Union[EnablePromptFalse, EnablePromptTrue]
     type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
+    field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
         title = "Enable Prompt"
@@ -322,6 +329,8 @@ class MaxConcurrentRequests(Config):
         json_schema_extra = {"shortDescription": "Parallel Requests"}
 
 
+
+
 class TextPromptConfigs(Configs):
     inputPrompt: InputPrompt
     apiProvider: APIProvider
@@ -357,6 +366,7 @@ class TextPromptExecutor(Config):
     class Config:
         title = "Text Prompt"
         json_schema_extra = {"target": {"value": 0}}
+
 
 
 
@@ -402,6 +412,7 @@ class UnconstrainedExecutor(Config):
         json_schema_extra = {"target": {"value": 0}}
 
 
+
 class OCRConfigs(Configs):
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -441,6 +452,7 @@ class OCRExecutor(Config):
     class Config:
         title = "Text Recognition (OCR)"
         json_schema_extra = {"target": {"value": 0}}
+
 
 
 class VQAConfigs(Configs):
@@ -487,7 +499,6 @@ class VQAExecutor(Config):
 
 class CaptionConfigs(Configs):
     enablePrompt: EnablePrompt
-    inputPrompt: InputPrompt
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
     extendedThinking: ExtendedThinking
@@ -531,7 +542,6 @@ class CaptionExecutor(Config):
 
 class DetailedCaptionConfigs(Configs):
     enablePrompt: EnablePrompt
-    inputPrompt: InputPrompt
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
     extendedThinking: ExtendedThinking
@@ -575,7 +585,6 @@ class DetailedCaptionExecutor(Config):
 
 class ClassificationConfigs(Configs):
     enablePrompt: EnablePrompt
-    inputPrompt: InputPrompt
     inputClasses: InputClasses
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -619,9 +628,9 @@ class ClassificationExecutor(Config):
 
 
 
+
 class MultiLabelConfigs(Configs):
     enablePrompt: EnablePrompt
-    inputPrompt: InputPrompt
     inputClasses: InputClasses
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -666,7 +675,6 @@ class MultiLabelExecutor(Config):
 
 class ObjectDetectionConfigs(Configs):
     enablePrompt: EnablePrompt
-    inputPrompt: InputPrompt
     inputClasses: InputClasses
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -751,8 +759,6 @@ class StructuredAnsweringExecutor(Config):
         title = "Structured Output Generation"
         json_schema_extra = {"target": {"value": 0}}
 
-
-
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[
@@ -779,6 +785,6 @@ class PackageConfigs(Configs):
 
 
 class PackageModel(Package):
-    name: Literal["AnthropicClaude"] = "AnthropicClaude"
+    name: Literal["Claude"] = "Claude"
     configs: PackageConfigs
     type: Literal["capsule"] = "capsule"
