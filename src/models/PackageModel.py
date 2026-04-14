@@ -134,17 +134,27 @@ class APIProvider(Config):
         json_schema_extra = {"shortDescription": "Anthropic or NovaVision"}
 
 
-class VersionHaiku(Config):
-    name: Literal["claude-haiku-4-5"] = "claude-haiku-4-5"
-    value: Literal["claude-haiku-4-5"] = "claude-haiku-4-5"
+class VersionOpus46(Config):
+    name: Literal["claude-opus-4-6"] = "claude-opus-4-6"
+    value: Literal["claude-opus-4-6"] = "claude-opus-4-6"
     type: Literal["string"] = "string"
     field: Literal["option"] = "option"
 
     class Config:
-        title = "Claude Haiku 4.5"
+        title = "Claude Opus 4.6"
 
 
-class VersionSonnet(Config):
+class VersionSonnet46(Config):
+    name: Literal["claude-sonnet-4-6"] = "claude-sonnet-4-6"
+    value: Literal["claude-sonnet-4-6"] = "claude-sonnet-4-6"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Claude Sonnet 4.6"
+
+
+class VersionSonnet45(Config):
     name: Literal["claude-sonnet-4-5"] = "claude-sonnet-4-5"
     value: Literal["claude-sonnet-4-5"] = "claude-sonnet-4-5"
     type: Literal["string"] = "string"
@@ -154,7 +164,17 @@ class VersionSonnet(Config):
         title = "Claude Sonnet 4.5"
 
 
-class VersionOpus(Config):
+class VersionHaiku45(Config):
+    name: Literal["claude-haiku-4-5"] = "claude-haiku-4-5"
+    value: Literal["claude-haiku-4-5"] = "claude-haiku-4-5"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Claude Haiku 4.5"
+
+
+class VersionOpus45(Config):
     name: Literal["claude-opus-4-5"] = "claude-opus-4-5"
     value: Literal["claude-opus-4-5"] = "claude-opus-4-5"
     type: Literal["string"] = "string"
@@ -164,15 +184,44 @@ class VersionOpus(Config):
         title = "Claude Opus 4.5"
 
 
+class VersionSonnet4(Config):
+    name: Literal["claude-sonnet-4"] = "claude-sonnet-4"
+    value: Literal["claude-sonnet-4"] = "claude-sonnet-4"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Claude Sonnet 4"
+
+
+class VersionOpus41(Config):
+    name: Literal["claude-opus-4-1"] = "claude-opus-4-1"
+    value: Literal["claude-opus-4-1"] = "claude-opus-4-1"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Claude Opus 4.1"
+
+
+class VersionOpus4(Config):
+    name: Literal["claude-opus-4"] = "claude-opus-4"
+    value: Literal["claude-opus-4"] = "claude-opus-4"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Claude Opus 4"
+
+
 class InputModelVersion(Config):
     """
     Select the Claude model version to use.
-    Haiku is fastest and most cost-effective.
-    Sonnet balances speed and intelligence.
-    Opus is the most capable model.
+    Opus 4.6 is the most capable. Haiku 4.5 is fastest and most cost-effective.
+    Sonnet models balance speed and intelligence.
     """
     name: Literal["inputModelVersion"] = "inputModelVersion"
-    value: Union[VersionHaiku, VersionSonnet, VersionOpus]
+    value: Union[VersionOpus46, VersionSonnet46, VersionSonnet45, VersionHaiku45, VersionOpus45, VersionSonnet4, VersionOpus41, VersionOpus4]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
 
@@ -320,7 +369,6 @@ class TextPromptExecutor(Config):
         json_schema_extra = {"target": {"value": 0}}
 
 
-
 class UnconstrainedConfigs(Configs):
     inputPrompt: InputPrompt
     apiProvider: APIProvider
@@ -361,6 +409,7 @@ class UnconstrainedExecutor(Config):
     class Config:
         title = "Open Prompt"
         json_schema_extra = {"target": {"value": 0}}
+
 
 
 class OCRConfigs(Configs):
@@ -489,7 +538,6 @@ class CaptionExecutor(Config):
         json_schema_extra = {"target": {"value": 0}}
 
 
-
 class DetailedCaptionConfigs(Configs):
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -575,6 +623,8 @@ class ClassificationExecutor(Config):
         json_schema_extra = {"target": {"value": 0}}
 
 
+
+
 class MultiLabelConfigs(Configs):
     inputClasses: InputClasses
     apiProvider: APIProvider
@@ -616,8 +666,6 @@ class MultiLabelExecutor(Config):
     class Config:
         title = "Multi-Label Classification"
         json_schema_extra = {"target": {"value": 0}}
-
-
 
 
 class ObjectDetectionConfigs(Configs):
@@ -733,6 +781,6 @@ class PackageConfigs(Configs):
 
 
 class PackageModel(Package):
-    name: Literal["AnthropicClaude"] = "AnthropicClaude"
+    name: Literal["Claude"] = "Claude"
     configs: PackageConfigs
     type: Literal["capsule"] = "capsule"
