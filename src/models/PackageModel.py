@@ -73,24 +73,41 @@ class InputPrompt(Config):
         json_schema_extra = {"shortDescription": "User Prompt"}
 
 
-class InputApiKey(Config):
-    """
-    Enter your Anthropic API key.
-    Keys starting with 'sk-ant-' are supported.
-    You can also use the NovaVision proxy by selecting NovaVision.
-    """
+class InputAnthropicApiKey(Config):
     name: Literal["inputApiKey"] = "inputApiKey"
-    value: str
+    value: str = ""
     type: Literal["string"] = "string"
     field: Literal["textInput"] = "textInput"
 
     class Config:
-        title = "API Key"
-        json_schema_extra = {"shortDescription": "Anthropic API Key"}
+        title = "Anthropic API Key"
+        json_schema_extra = {"shortDescription": "sk-ant-..."}
+
+
+class InputNovaVisionApiKey(Config):
+    name: Literal["inputApiKey"] = "inputApiKey"
+    value: str = ""
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "NovaVision Access Token"
+        json_schema_extra = {"shortDescription": "NovaVision Token"}
+
+
+class InputRoboflowApiKey(Config):
+    name: Literal["inputApiKey"] = "inputApiKey"
+    value: str = ""
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Roboflow API Key"
+        json_schema_extra = {"shortDescription": "Roboflow Key"}
 
 
 class AnthropicAPIConfigs(Configs):
-    inputApiKey: InputApiKey
+    inputApiKey: InputAnthropicApiKey
 
 
 class AnthropicAPIOption(Config):
@@ -105,7 +122,7 @@ class AnthropicAPIOption(Config):
 
 
 class NovaVisionAPIConfigs(Configs):
-    pass
+    inputApiKey: InputNovaVisionApiKey
 
 
 class NovaVisionOption(Config):
@@ -119,19 +136,36 @@ class NovaVisionOption(Config):
         json_schema_extra = {"target": "value"}
 
 
+class RoboflowAPIConfigs(Configs):
+    inputApiKey: InputRoboflowApiKey
+
+
+class RoboflowOption(Config):
+    name: Literal["Roboflow"] = "Roboflow"
+    value: RoboflowAPIConfigs
+    type: Literal["object"] = "object"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Roboflow"
+        json_schema_extra = {"target": "value"}
+
+
 class APIProvider(Config):
     """
-    Select Anthropic API if you have a credited Anthropic API key,
-    or use the NovaVision access token by selecting NovaVision.
+    Select your API provider.
+    Anthropic: use your own Anthropic API key.
+    NovaVision: use your NovaVision access token.
+    Roboflow: use your Roboflow API key (proxies through Roboflow).
     """
     name: Literal["apiProvider"] = "apiProvider"
-    value: Union[AnthropicAPIOption, NovaVisionOption]
+    value: Union[AnthropicAPIOption, NovaVisionOption, RoboflowOption]
     type: Literal["object"] = "object"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
         title = "API Provider"
-        json_schema_extra = {"shortDescription": "Anthropic or NovaVision"}
+        json_schema_extra = {"shortDescription": "Anthropic, NovaVision or Roboflow"}
 
 
 class VersionOpus46(Config):
@@ -412,6 +446,7 @@ class UnconstrainedExecutor(Config):
 
 
 
+
 class OCRConfigs(Configs):
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -538,6 +573,7 @@ class CaptionExecutor(Config):
         json_schema_extra = {"target": {"value": 0}}
 
 
+
 class DetailedCaptionConfigs(Configs):
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -621,8 +657,6 @@ class ClassificationExecutor(Config):
     class Config:
         title = "Single-Label Classification"
         json_schema_extra = {"target": {"value": 0}}
-
-
 
 
 class MultiLabelConfigs(Configs):
