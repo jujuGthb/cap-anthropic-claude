@@ -96,8 +96,12 @@ class ObjectDetectionExecutor(Capsule):
 
         try:
             if self.api_provider == "NovaVision":
-                url = f"{self.environment.web_api}/apiproxy/anthropic?access-token={self.environment.device_access_token}"
+                url = f"{self.environment.web_api}/apiproxy/anthropic?access-token={self.api_key}"
                 response = requests.post(url, json=payload)
+            elif self.api_provider == "Roboflow":
+                url = "https://detect.roboflow.com/apiproxy/anthropic"
+                payload["anthropic_api_key"] = "rf_key:account"
+                response = requests.post(url, params={"api_key": self.api_key}, json=payload)
             else:
                 response = requests.post(
                     CLAUDE_API_URL,
