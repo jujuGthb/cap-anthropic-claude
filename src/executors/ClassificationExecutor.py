@@ -150,10 +150,15 @@ class ClassificationExecutor(Capsule):
 
                 self.claude_text = next(
                     (block.text for block in result.content if block.type == "text"), ""
+                    
                 )
+                print(f"[DEBUG] claude_text: {self.claude_text}")
                 if not self.claude_text:
                     raise ValueError("Claude API returned no text content in response.")
 
+
+
+            print(f"[DEBUG] claude_text: {self.claude_text}")
             try:
                 parsed = json.loads(self.claude_text)
                 class_name = parsed.get("class_name", "")
