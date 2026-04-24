@@ -95,17 +95,6 @@ class InputNovaVisionApiKey(Config):
         json_schema_extra = {"shortDescription": "NovaVision Token"}
 
 
-class InputRoboflowApiKey(Config):
-    name: Literal["inputApiKey"] = "inputApiKey"
-    value: str = ""
-    type: Literal["string"] = "string"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Roboflow API Key"
-        json_schema_extra = {"shortDescription": "Roboflow Key"}
-
-
 class AnthropicAPIConfigs(Configs):
     inputApiKey: InputAnthropicApiKey
 
@@ -136,36 +125,19 @@ class NovaVisionOption(Config):
         json_schema_extra = {"target": "value"}
 
 
-class RoboflowAPIConfigs(Configs):
-    inputApiKey: InputRoboflowApiKey
-
-
-class RoboflowOption(Config):
-    name: Literal["Roboflow"] = "Roboflow"
-    value: RoboflowAPIConfigs
-    type: Literal["object"] = "object"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Roboflow"
-        json_schema_extra = {"target": "value"}
-
-
 class APIProvider(Config):
     """
-    Select your API provider.
-    Anthropic: use your own Anthropic API key.
-    NovaVision: use your NovaVision access token.
-    Roboflow: use your Roboflow API key (proxies through Roboflow).
+    Select Anthropic API if you have a credited Anthropic API key,
+    or use the NovaVision access token by selecting NovaVision.
     """
     name: Literal["apiProvider"] = "apiProvider"
-    value: Union[AnthropicAPIOption, NovaVisionOption, RoboflowOption]
+    value: Union[AnthropicAPIOption, NovaVisionOption]
     type: Literal["object"] = "object"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
         title = "API Provider"
-        json_schema_extra = {"shortDescription": "Anthropic, NovaVision or Roboflow"}
+        json_schema_extra = {"shortDescription": "Anthropic or NovaVision"}
 
 
 class VersionOpus46(Config):
@@ -365,7 +337,6 @@ class MaxConcurrentRequests(Config):
         json_schema_extra = {"shortDescription": "Parallel Requests"}
 
 
-
 class TextPromptConfigs(Configs):
     inputPrompt: InputPrompt
     apiProvider: APIProvider
@@ -444,9 +415,6 @@ class UnconstrainedExecutor(Config):
         title = "Open Prompt"
         json_schema_extra = {"target": {"value": 0}}
 
-
-
-
 class OCRConfigs(Configs):
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -486,8 +454,6 @@ class OCRExecutor(Config):
     class Config:
         title = "Text Recognition (OCR)"
         json_schema_extra = {"target": {"value": 0}}
-
-
 
 class VQAConfigs(Configs):
     inputPrompt: InputPrompt
@@ -572,8 +538,6 @@ class CaptionExecutor(Config):
         title = "Captioning (Short)"
         json_schema_extra = {"target": {"value": 0}}
 
-
-
 class DetailedCaptionConfigs(Configs):
     apiProvider: APIProvider
     inputModelVersion: InputModelVersion
@@ -613,7 +577,6 @@ class DetailedCaptionExecutor(Config):
     class Config:
         title = "Captioning (Detailed)"
         json_schema_extra = {"target": {"value": 0}}
-
 
 
 class ClassificationConfigs(Configs):
@@ -658,7 +621,6 @@ class ClassificationExecutor(Config):
         title = "Single-Label Classification"
         json_schema_extra = {"target": {"value": 0}}
 
-
 class MultiLabelConfigs(Configs):
     inputClasses: InputClasses
     apiProvider: APIProvider
@@ -700,7 +662,6 @@ class MultiLabelExecutor(Config):
     class Config:
         title = "Multi-Label Classification"
         json_schema_extra = {"target": {"value": 0}}
-
 
 class ObjectDetectionConfigs(Configs):
     inputClasses: InputClasses
@@ -744,8 +705,6 @@ class ObjectDetectionExecutor(Config):
         title = "Object Detection"
         json_schema_extra = {"target": {"value": 0}}
 
-
-
 class StructuredAnsweringConfigs(Configs):
     inputPrompt: InputPrompt
     apiProvider: APIProvider
@@ -786,7 +745,6 @@ class StructuredAnsweringExecutor(Config):
     class Config:
         title = "Structured Output Generation"
         json_schema_extra = {"target": {"value": 0}}
-
 
 
 class ConfigExecutor(Config):

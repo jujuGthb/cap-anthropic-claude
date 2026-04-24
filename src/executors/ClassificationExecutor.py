@@ -7,6 +7,8 @@ import sys
 import base64
 import json
 import requests
+import anthropic
+from anthropic import NOT_GIVEN
 import cv2
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
@@ -45,18 +47,16 @@ class ClassificationExecutor(Capsule):
 
     def _build_payload(self, base64_image):
         serialised_classes = ", ".join(self.classes) if isinstance(self.classes, list) else (self.classes or "")
-        system_prompt = (
-            'You act as a single-class classification model. You must provide reasonable predictions. '
-            'You are only allowed to produce a JSON document. '
-            'Expected structure: {"class_name": "class-name", "confidence": 0.9}. '
-            '`class-name` must be one of the classes defined by the user. '
-            'Return a single JSON object only, no list.'
-        )
-
         payload = {
             "model": self.model_version,
             "max_tokens": self.max_tokens,
-            "system": system_prompt,
+            "system": (
+                'You act as a single-class classification model. You must provide reasonable predictions. '
+                'You are only allowed to produce a JSON document. '
+                'Expected structure: {"class_name": "class-name", "confidence": 0.9}. '
+                '`class-name` must be one of the classes defined by the user. '
+                'Return a single JSON object only, no list.'
+            ),
             "messages": [
                 {
                     "role": "user",
@@ -97,46 +97,63 @@ class ClassificationExecutor(Capsule):
             if self.api_provider == "NovaVision":
                 url = f"{self.environment.web_api}/apiproxy/anthropic?access-token={self.api_key}"
                 response = requests.post(url, json=payload)
-            elif self.api_provider == "Roboflow":
-                url = "https://detect.roboflow.com/apiproxy/anthropic"
-                payload["anthropic_api_key"] = "rf_key:account"
-                response = requests.post(url, params={"api_key": self.api_key}, json=payload)
+
+                print(f"[DEBUG] Status: {response.status_code}")
+                print(f"[DEBUG] Response: {response.text[:500]}")
+
+                response.raise_for_status()
+                data = response.json()
+
+                stop_reason = data.get("stop_reason")
+                if stop_reason == "max_tokens":
+                    raise ValueError(
+                        "Claude API stopped generation because the max_tokens limit was reached. "
+                        "Please increase the maxTokens parameter to allow for a complete response."
+                    )
+                if stop_reason not in ["end_turn", "stop_sequence", None]:
+                    raise ValueError(
+                        f"Claude API stopped generation with unexpected stop reason: {stop_reason}."
+                    )
+
+                content = data.get("content", [])
+                if not content:
+                    raise ValueError("Claude API returned no content in response.")
+                self.claude_text = next(
+                    (block["text"] for block in content if block.get("type") == "text"), ""
+                )
+                if not self.claude_text:
+                    raise ValueError("Claude API returned no text content in response.")
+
             else:
-                response = requests.post(
-                    CLAUDE_API_URL,
-                    headers={
-                        "x-api-key": self.api_key,
-                        "anthropic-version": ANTHROPIC_VERSION,
-                        "content-type": "application/json",
-                    },
-                    json=payload,
+                client = anthropic.Anthropic(api_key=self.api_key)
+                temperature = NOT_GIVEN if (self.temperature is None or self.extended_thinking) else self.temperature
+                system = payload.get("system", NOT_GIVEN)
+
+                result = client.messages.create(
+                    model=payload["model"],
+                    max_tokens=payload["max_tokens"],
+                    system=system,
+                    messages=payload["messages"],
+                    temperature=temperature,
                 )
 
-            print(f"[DEBUG] Status: {response.status_code}")
-            print(f"[DEBUG] Response: {response.text[:500]}")
+                stop_reason = result.stop_reason
+                if stop_reason == "max_tokens":
+                    raise ValueError(
+                        "Claude API stopped generation because the max_tokens limit was reached. "
+                        "Please increase the maxTokens parameter to allow for a complete response."
+                    )
+                if stop_reason not in ["end_turn", "stop_sequence"]:
+                    raise ValueError(
+                        f"Claude API stopped generation with unexpected stop reason: {stop_reason}."
+                    )
 
-            response.raise_for_status()
-            data = response.json()
-
-            stop_reason = data.get("stop_reason")
-            if stop_reason == "max_tokens":
-                raise ValueError(
-                    "Claude API stopped generation because the max_tokens limit was reached. "
-                    "Please increase the maxTokens parameter to allow for a complete response."
+                self.claude_text = next(
+                    (block.text for block in result.content if block.type == "text"), ""
                 )
-            if stop_reason not in ["end_turn", "stop_sequence", None]:
-                raise ValueError(
-                    f"Claude API stopped generation with unexpected stop reason: {stop_reason}."
-                )
+                if not self.claude_text:
+                    raise ValueError("Claude API returned no text content in response.")
 
-            content = data.get("content", [])
-            if not content:
-                raise ValueError("Claude API returned no content in response.")
-            self.claude_text = next(
-                (block["text"] for block in content if block.get("type") == "text"), ""
-            )
-            if not self.claude_text:
-                raise ValueError("Claude API returned no text content in response.")
             try:
                 parsed = json.loads(self.claude_text)
                 class_name = parsed.get("class_name", "")

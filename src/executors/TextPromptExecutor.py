@@ -91,50 +91,19 @@ class TextPromptExecutor(Capsule):
                 if not self.claude_text:
                     raise ValueError("Claude API returned no text content in response.")
 
-            elif self.api_provider == "Roboflow":
-                url = "https://detect.roboflow.com/apiproxy/anthropic"
-                payload["anthropic_api_key"] = "rf_key:account"
-                response = requests.post(url, params={"api_key": self.api_key}, json=payload)
-
-                print(f"[DEBUG] Status: {response.status_code}")
-                print(f"[DEBUG] Response: {response.text[:500]}")
-
-                response.raise_for_status()
-                data = response.json()
-
-                stop_reason = data.get("stop_reason")
-                if stop_reason == "max_tokens":
-                    raise ValueError(
-                        "Claude API stopped generation because the max_tokens limit was reached. "
-                        "Please increase the maxTokens parameter to allow for a complete response."
-                    )
-                if stop_reason not in ["end_turn", "stop_sequence", None]:
-                    raise ValueError(
-                        f"Claude API stopped generation with unexpected stop reason: {stop_reason}."
-                    )
-
-                content = data.get("content", [])
-                if not content:
-                    raise ValueError("Claude API returned no content in response.")
-                self.claude_text = next(
-                    (block["text"] for block in content if block.get("type") == "text"), ""
-                )
-                if not self.claude_text:
-                    raise ValueError("Claude API returned no text content in response.")
 
             else:
                 client = anthropic.Anthropic(api_key=self.api_key)
                 temperature = NOT_GIVEN if (self.temperature is None or self.extended_thinking) else self.temperature
                 system = payload.get("system", NOT_GIVEN)
 
-                with client.messages.stream(
+                result = client.messages.create(
                     model=payload["model"],
                     max_tokens=payload["max_tokens"],
                     system=system,
                     messages=payload["messages"],
                     temperature=temperature,
-                ) as stream:
-                    result = stream.get_final_message()
+                )
 
                 stop_reason = result.stop_reason
                 if stop_reason == "max_tokens":
