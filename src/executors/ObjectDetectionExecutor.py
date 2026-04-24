@@ -37,7 +37,7 @@ class ObjectDetectionExecutor(Capsule):
         self.extended_thinking = self.request.get_param("extendedThinking")
         self.thinking_budget_tokens = self.request.get_param("thinkingBudgetTokens")
         self.temperature = self.request.get_param("inputTemperature")
-        self.max_tokens = self.request.get_param("maxTokens")
+        self.max_tokens = self.request.get_param("maxTokens") or 3000
         self.max_concurrent_requests = self.request.get_param("maxConcurrentRequests")
         self.image_selector = self.request.get_param("inputImage")
 
@@ -156,7 +156,11 @@ class ObjectDetectionExecutor(Capsule):
                     raise ValueError("Claude API returned no text content in response.")
 
             try:
-                parsed = json.loads(self.claude_text)
+                clean_text = self.claude_text.strip()
+                if clean_text.startswith("```"):
+                    clean_text = clean_text[clean_text.find("\n")+1:]
+                    clean_text = clean_text[:clean_text.rfind("```")].strip()
+                parsed = json.loads(clean_text)
                 detections = parsed.get("detections", [])
                 seen = set()
                 self.claude_classes = [
