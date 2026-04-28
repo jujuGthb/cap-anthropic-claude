@@ -29,8 +29,6 @@ class OCRExecutor(Capsule):
 
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
-        print(f"[DEBUG] Full api_key received: '{self.api_key}'")
-        print(f"[DEBUG] api_key length: {len(self.api_key) if self.api_key else 0}")
         self.model_version = self.request.get_param("inputModelVersion")
         self.extended_thinking = self.request.get_param("extendedThinking")
         self.thinking_budget_tokens = self.request.get_param("thinkingBudgetTokens")
@@ -92,9 +90,6 @@ class OCRExecutor(Capsule):
                 url = f"{self.environment.web_api}/apiproxy/anthropic?access-token={self.api_key}"
                 response = requests.post(url, json=payload)
 
-                print(f"[DEBUG] Status: {response.status_code}")
-                print(f"[DEBUG] Response: {response.text[:500]}")
-
                 response.raise_for_status()
                 data = response.json()
 
@@ -155,7 +150,6 @@ class OCRExecutor(Capsule):
             self.claude_classes = []
         except Exception as e:
             import traceback
-            print(traceback.format_exc())
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
