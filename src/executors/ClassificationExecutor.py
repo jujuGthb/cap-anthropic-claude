@@ -164,7 +164,6 @@ class ClassificationExecutor(Capsule):
             self.claude_text = f"HTTP Error {response.status_code}: {response.text}"
             self.claude_classes = []
         except Exception as e:
-            import traceback
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
