@@ -31,8 +31,6 @@ class ObjectDetectionExecutor(Capsule):
         self.classes = self.request.get_param("inputClasses")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
-        print(f"[DEBUG] Full api_key received: '{self.api_key}'")
-        print(f"[DEBUG] api_key length: {len(self.api_key) if self.api_key else 0}")
         self.model_version = self.request.get_param("inputModelVersion")
         self.extended_thinking = self.request.get_param("extendedThinking")
         self.thinking_budget_tokens = self.request.get_param("thinkingBudgetTokens")
@@ -98,10 +96,6 @@ class ObjectDetectionExecutor(Capsule):
             if self.api_provider == "NovaVision":
                 url = f"{self.environment.web_api}/apiproxy/anthropic?access-token={self.api_key}"
                 response = requests.post(url, json=payload)
-
-                print(f"[DEBUG] Status: {response.status_code}")
-                print(f"[DEBUG] Response: {response.text[:500]}")
-
                 response.raise_for_status()
                 data = response.json()
 
@@ -167,7 +161,6 @@ class ObjectDetectionExecutor(Capsule):
                     d["class_name"] for d in detections
                     if "class_name" in d and not (d["class_name"] in seen or seen.add(d["class_name"]))
                 ]
-                print(f"[DEBUG] claude_classes: {self.claude_classes}")
             except (json.JSONDecodeError, KeyError):
                 self.claude_classes = []
 
@@ -176,7 +169,6 @@ class ObjectDetectionExecutor(Capsule):
             self.claude_classes = []
         except Exception as e:
             import traceback
-            print(traceback.format_exc())
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
