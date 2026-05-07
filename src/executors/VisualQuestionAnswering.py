@@ -15,14 +15,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.capsule import Capsule
 from sdks.novavision.src.helper.executor import Executor
-from capsules.AnthropicClaude.src.utils.response import build_response_structured_answering
+from capsules.AnthropicClaude.src.utils.response import build_response_vqa
 from capsules.AnthropicClaude.src.models.PackageModel import PackageModel
 
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 
 
-class StructuredAnsweringExecutor(Capsule):
+class VisualQuestionAnswering(Capsule):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
@@ -47,10 +47,10 @@ class StructuredAnsweringExecutor(Capsule):
             "model": self.model_version,
             "max_tokens": self.max_tokens,
             "system": (
-                "You are supposed to produce responses in JSON. "
-                "The user will provide a dictionary where keys are field names and values are descriptions. "
-                "Every key must be present in your response. "
-                "Provide only the JSON object in your response, nothing else."
+                "You act as a Visual Question Answering model. "
+                "Answer the user's question about the image. "
+                "For open questions, answer in a few sentences. "
+                "For multiple-choice questions, return only the answer indicator."
             ),
             "messages": [
                 {
@@ -64,7 +64,7 @@ class StructuredAnsweringExecutor(Capsule):
                                 "data": base64_image,
                             },
                         },
-                        {"type": "text", "text": f"Output structure specification:\n{self.prompt}"},
+                        {"type": "text", "text": f"Question: {self.prompt}"},
                     ],
                 }
             ],
@@ -154,7 +154,7 @@ class StructuredAnsweringExecutor(Capsule):
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
-        return build_response_structured_answering(context=self)
+        return build_response_vqa(context=self)
 
 
 if "__main__" == __name__:

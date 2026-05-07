@@ -448,13 +448,13 @@ class TextPromptResponse(Response):
     outputs: TextPromptOutputs
 
 
-class TextPromptExecutor(Config):
+class TextPrompt(Config):
     """
     Generates a text response based on a custom prompt.
     No image input is required for this task.
     Use for pure text tasks like content generation or Q&A.
     """
-    name: Literal["TextPromptExecutor"] = "TextPromptExecutor"
+    name: Literal["TextPrompt"] = "TextPrompt"
     value: Union[TextPromptRequest, TextPromptResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -495,13 +495,13 @@ class UnconstrainedResponse(Response):
     outputs: UnconstrainedOutputs
 
 
-class UnconstrainedExecutor(Config):
+class Unconstrained(Config):
     """
     Analyzes an image using a fully custom prompt without predefined constraints.
     Provides maximum flexibility for open-ended visual analysis.
     Use when no structured output format is required.
     """
-    name: Literal["UnconstrainedExecutor"] = "UnconstrainedExecutor"
+    name: Literal["Unconstrained"] = "Unconstrained"
     value: Union[UnconstrainedRequest, UnconstrainedResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -540,13 +540,13 @@ class OCRResponse(Response):
     outputs: OCROutputs
 
 
-class OCRExecutor(Config):
+class OCR(Config):
     """
     Extracts all text present in an image using optical character recognition.
     Returns the detected text as a plain string.
     Works on documents, signs, labels, and handwritten content.
     """
-    name: Literal["OCRExecutor"] = "OCRExecutor"
+    name: Literal["OCR"] = "OCR"
     value: Union[OCRRequest, OCRResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -586,13 +586,13 @@ class VQAResponse(Response):
     outputs: VQAOutputs
 
 
-class VQAExecutor(Config):
+class VisualQuestionAnswering(Config):
     """
     Answers a specific question about the content of an image.
     Provide a question as the prompt and receive a targeted answer.
     Useful for structured visual inspection and querying.
     """
-    name: Literal["VQAExecutor"] = "VQAExecutor"
+    name: Literal["VisualQuestionAnswering"] = "VisualQuestionAnswering"
     value: Union[VQARequest, VQAResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -633,13 +633,13 @@ class CaptionResponse(Response):
     outputs: CaptionOutputs
 
 
-class CaptionExecutor(Config):
+class ShortCaption(Capsule):
     """
     Generates a concise one or two sentence caption describing an image.
     Suitable for labeling, quick summaries, or image metadata.
     Use Detailed Captioning for richer, longer descriptions.
     """
-    name: Literal["CaptionExecutor"] = "CaptionExecutor"
+    name: Literal["ShortCaption"] = "ShortCaption"
     value: Union[CaptionRequest, CaptionResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -678,13 +678,13 @@ class DetailedCaptionResponse(Response):
     outputs: DetailedCaptionOutputs
 
 
-class DetailedCaptionExecutor(Config):
+class DetailedCaption(Config):
     """
     Generates a comprehensive multi-sentence description of an image.
     Covers objects, attributes, spatial relationships, and scene context.
     Use for thorough image documentation or accessibility alt-text.
     """
-    name: Literal["DetailedCaptionExecutor"] = "DetailedCaptionExecutor"
+    name: Literal["DetailedCaption"] = "DetailedCaption"
     value: Union[DetailedCaptionRequest, DetailedCaptionResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -726,13 +726,13 @@ class ClassificationResponse(Response):
     outputs: ClassificationOutputs
 
 
-class ClassificationExecutor(Config):
+class Classification(Config):
     """
     Assigns exactly one class label from a predefined list to an image.
     The model selects the single most appropriate class.
     Provide the list of valid classes using the Classes config.
     """
-    name: Literal["ClassificationExecutor"] = "ClassificationExecutor"
+    name: Literal["Classification"] = "Classification"
     value: Union[ClassificationRequest, ClassificationResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -773,13 +773,13 @@ class MultiLabelResponse(Response):
     outputs: MultiLabelOutputs
 
 
-class MultiLabelExecutor(Config):
+class MultiLabel(Config):
     """
     Assigns one or more class labels from a predefined list to an image.
     The model selects all classes that apply to the image.
     Provide the list of valid classes using the Classes config.
     """
-    name: Literal["MultiLabelExecutor"] = "MultiLabelExecutor"
+    name: Literal["MultiLabel"] = "MultiLabel"
     value: Union[MultiLabelRequest, MultiLabelResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -820,13 +820,13 @@ class ObjectDetectionResponse(Response):
     outputs: ObjectDetectionOutputs
 
 
-class ObjectDetectionExecutor(Config):
+class ObjectDetection(Config):
     """
     Detects and identifies objects in an image from a predefined class list.
     Returns detected class names found within the image.
     Provide the list of target classes using the Classes config.
     """
-    name: Literal["ObjectDetectionExecutor"] = "ObjectDetectionExecutor"
+    name: Literal["ObjectDetection"] = "ObjectDetection"
     value: Union[ObjectDetectionRequest, ObjectDetectionResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -866,13 +866,13 @@ class StructuredAnsweringResponse(Response):
     outputs: StructuredAnsweringOutputs
 
 
-class StructuredAnsweringExecutor(Config):
+class StructuredAnswering(Config):
     """
     Generates a structured output (e.g. JSON) based on a custom prompt and image.
     Use the prompt to define the desired output schema or format.
     Ideal for extracting structured data from visual content.
     """
-    name: Literal["StructuredAnsweringExecutor"] = "StructuredAnsweringExecutor"
+    name: Literal["StructuredAnswering"] = "StructuredAnswering"
     value: Union[StructuredAnsweringRequest, StructuredAnsweringResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
@@ -890,16 +890,16 @@ class ConfigExecutor(Config):
     """
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[
-        TextPromptExecutor,
-        UnconstrainedExecutor,
-        OCRExecutor,
-        VQAExecutor,
-        CaptionExecutor,
-        DetailedCaptionExecutor,
-        ClassificationExecutor,
-        MultiLabelExecutor,
-        ObjectDetectionExecutor,
-        StructuredAnsweringExecutor,
+        TextPrompt,
+        Unconstrained,
+        OCR,
+        VisualQuestionAnswering,
+        ShortCaption,
+        DetailedCaption,
+        Classification,
+        MultiLabel,
+        ObjectDetection,
+        StructuredAnswering,
     ]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"

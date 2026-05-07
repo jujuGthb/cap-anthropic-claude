@@ -16,14 +16,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.capsule import Capsule
 from sdks.novavision.src.helper.executor import Executor
-from capsules.AnthropicClaude.src.utils.response import build_response_classification
+from capsules.AnthropicClaude.src.utils.response import build_response_object_detection
 from capsules.AnthropicClaude.src.models.PackageModel import PackageModel
 
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 
 
-class ClassificationExecutor(Capsule):
+class ObjectDetection(Capsule):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
@@ -49,11 +49,12 @@ class ClassificationExecutor(Capsule):
             "model": self.model_version,
             "max_tokens": self.max_tokens,
             "system": (
-                'You act as a single-class classification model. You must provide reasonable predictions. '
+                'You act as an object-detection model. You must provide reasonable predictions. '
                 'You are only allowed to produce a JSON document. '
-                'Expected structure: {"class_name": "class-name", "confidence": 0.9}. '
-                '`class-name` must be one of the classes defined by the user. '
-                'Return a single JSON object only, no list.'
+                'Expected structure: {"detections": [{"x_min": 0.1, "y_min": 0.2, "x_max": 0.3, "y_max": 0.4, '
+                '"class_name": "my-class", "confidence": 0.7}]}. '
+                'All coordinates must be in range 0.0-1.0 as a proportion of image dimensions. '
+                'Detect all instances of the provided classes.'
             ),
             "messages": [
                 {
@@ -95,7 +96,6 @@ class ClassificationExecutor(Capsule):
             if self.api_provider == "NovaVision":
                 url = f"{self.environment.web_api}/apiproxy/anthropic?access-token={self.api_key}"
                 response = requests.post(url, json=payload)
-
                 response.raise_for_status()
                 data = response.json()
 
@@ -155,8 +155,12 @@ class ClassificationExecutor(Capsule):
                     clean_text = clean_text[clean_text.find("\n")+1:]
                     clean_text = clean_text[:clean_text.rfind("```")].strip()
                 parsed = json.loads(clean_text)
-                class_name = parsed.get("class_name", "")
-                self.claude_classes = [class_name] if class_name else []
+                detections = parsed.get("detections", [])
+                seen = set()
+                self.claude_classes = [
+                    d["class_name"] for d in detections
+                    if "class_name" in d and not (d["class_name"] in seen or seen.add(d["class_name"]))
+                ]
             except (json.JSONDecodeError, KeyError):
                 self.claude_classes = []
 
@@ -167,7 +171,7 @@ class ClassificationExecutor(Capsule):
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
-        return build_response_classification(context=self)
+        return build_response_object_detection(context=self)
 
 
 if "__main__" == __name__:

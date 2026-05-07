@@ -15,18 +15,19 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.capsule import Capsule
 from sdks.novavision.src.helper.executor import Executor
-from capsules.AnthropicClaude.src.utils.response import build_response_ocr
+from capsules.AnthropicClaude.src.utils.response import build_response_structured_answering
 from capsules.AnthropicClaude.src.models.PackageModel import PackageModel
 
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 
 
-class OCRExecutor(Capsule):
+class StructuredAnswering(Capsule):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
 
+        self.prompt = self.request.get_param("inputPrompt")
         self.api_provider = self.request.get_param("apiProvider")
         self.api_key = self.request.get_param("inputApiKey")
         self.model_version = self.request.get_param("inputModelVersion")
@@ -46,9 +47,10 @@ class OCRExecutor(Capsule):
             "model": self.model_version,
             "max_tokens": self.max_tokens,
             "system": (
-                "You act as an OCR model. Read all text from the image and return it in "
-                "paragraphs that reflect the structure of the original text. "
-                "Return only the recognised text, nothing else."
+                "You are supposed to produce responses in JSON. "
+                "The user will provide a dictionary where keys are field names and values are descriptions. "
+                "Every key must be present in your response. "
+                "Provide only the JSON object in your response, nothing else."
             ),
             "messages": [
                 {
@@ -62,6 +64,7 @@ class OCRExecutor(Capsule):
                                 "data": base64_image,
                             },
                         },
+                        {"type": "text", "text": f"Output structure specification:\n{self.prompt}"},
                     ],
                 }
             ],
@@ -89,7 +92,6 @@ class OCRExecutor(Capsule):
             if self.api_provider == "NovaVision":
                 url = f"{self.environment.web_api}/apiproxy/anthropic?access-token={self.api_key}"
                 response = requests.post(url, json=payload)
-
                 response.raise_for_status()
                 data = response.json()
 
@@ -152,7 +154,7 @@ class OCRExecutor(Capsule):
             self.claude_text = f"API Error: {str(e)}"
             self.claude_classes = []
 
-        return build_response_ocr(context=self)
+        return build_response_structured_answering(context=self)
 
 
 if "__main__" == __name__:

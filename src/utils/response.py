@@ -5,34 +5,34 @@ from capsules.AnthropicClaude.src.models.PackageModel import (
     ConfigExecutor,
     OutputText,
     Classes,
-    TextPromptExecutor,
+    TextPrompt,
     TextPromptResponse,
     TextPromptOutputs,
-    UnconstrainedExecutor,
+    Unconstrained,
     UnconstrainedResponse,
     UnconstrainedOutputs,
-    OCRExecutor,
+    OCR,
     OCRResponse,
     OCROutputs,
-    VQAExecutor,
+    VisualQuestionAnswering,
     VQAResponse,
     VQAOutputs,
-    CaptionExecutor,
+    ShortCaption,
     CaptionResponse,
     CaptionOutputs,
-    DetailedCaptionExecutor,
+    DetailedCaption,
     DetailedCaptionResponse,
     DetailedCaptionOutputs,
-    ClassificationExecutor,
+    Classification,
     ClassificationResponse,
     ClassificationOutputs,
     MultiLabelExecutor,
     MultiLabelResponse,
     MultiLabelOutputs,
-    ObjectDetectionExecutor,
+    ObjectDetection,
     ObjectDetectionResponse,
     ObjectDetectionOutputs,
-    StructuredAnsweringExecutor,
+    StructuredAnswering,
     StructuredAnsweringResponse,
     StructuredAnsweringOutputs,
 )
@@ -42,7 +42,7 @@ def build_response_text_prompt(context):
     output = OutputText(value=context.claude_text)
     outputs = TextPromptOutputs(output=output)
     response = TextPromptResponse(outputs=outputs)
-    executor = TextPromptExecutor(value=response)
+    executor = TextPrompt(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -54,7 +54,7 @@ def build_response_unconstrained(context):
     output = OutputText(value=context.claude_text)
     outputs = UnconstrainedOutputs(output=output)
     response = UnconstrainedResponse(outputs=outputs)
-    executor = UnconstrainedExecutor(value=response)
+    executor = Unconstrained(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -66,7 +66,7 @@ def build_response_ocr(context):
     output = OutputText(value=context.claude_text)
     outputs = OCROutputs(output=output)
     response = OCRResponse(outputs=outputs)
-    executor = OCRExecutor(value=response)
+    executor = OCR(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -78,7 +78,7 @@ def build_response_vqa(context):
     output = OutputText(value=context.claude_text)
     outputs = VQAOutputs(output=output)
     response = VQAResponse(outputs=outputs)
-    executor = VQAExecutor(value=response)
+    executor = VisualQuestionAnswering(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -90,7 +90,7 @@ def build_response_caption(context):
     output = OutputText(value=context.claude_text)
     outputs = CaptionOutputs(output=output)
     response = CaptionResponse(outputs=outputs)
-    executor = CaptionExecutor(value=response)
+    executor = ShortCaption(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -102,7 +102,7 @@ def build_response_detailed_caption(context):
     output = OutputText(value=context.claude_text)
     outputs = DetailedCaptionOutputs(output=output)
     response = DetailedCaptionResponse(outputs=outputs)
-    executor = DetailedCaptionExecutor(value=response)
+    executor = DetailedCaption(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -115,7 +115,7 @@ def build_response_classification(context):
     classes = Classes(value=context.claude_classes if context.claude_classes else [])
     outputs = ClassificationOutputs(output=output, classes=classes)
     response = ClassificationResponse(outputs=outputs)
-    executor = ClassificationExecutor(value=response)
+    executor = Classification(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -141,7 +141,7 @@ def build_response_object_detection(context):
     classes = Classes(value=context.claude_classes if context.claude_classes else [])
     outputs = ObjectDetectionOutputs(output=output, classes=classes)
     response = ObjectDetectionResponse(outputs=outputs)
-    executor = ObjectDetectionExecutor(value=response)
+    executor = ObjectDetection(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
@@ -153,7 +153,7 @@ def build_response_structured_answering(context):
     output = OutputText(value=context.claude_text)
     outputs = StructuredAnsweringOutputs(output=output)
     response = StructuredAnsweringResponse(outputs=outputs)
-    executor = StructuredAnsweringExecutor(value=response)
+    executor = StructuredAnswering(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
