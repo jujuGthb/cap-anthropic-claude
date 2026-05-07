@@ -2,22 +2,12 @@
 
 A NOVAVISION capsule that integrates Anthropic's Claude API for image analysis and vision tasks.
 
-## Features
-
-- Image captioning (short & detailed)
-- Object detection & classification
-- Multi-label classification
-- OCR (Optical Character Recognition)
-- Visual Question Answering
-- Structured data extraction
-- Text prompting
-
 ## Requirements
 
 - `anthropic` SDK
 - `pydantic`
 - `opencv-python`
-- Anthropic API key
+- Anthropic API key — get one at [console.anthropic.com](https://console.anthropic.com)
 
 ## Configuration
 
