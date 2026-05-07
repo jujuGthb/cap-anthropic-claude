@@ -63,6 +63,11 @@ class InputClasses(Config):
 
 
 class InputPrompt(Config):
+    """
+    The custom prompt sent with the image to guide the model's response.
+    Use this to specify the task, output format, or focus area.
+    Leave blank to use the default task-specific prompt.
+    """
     name: Literal["inputPrompt"] = "inputPrompt"
     value: str = ""
     type: Literal["string"] = "string"
@@ -74,6 +79,11 @@ class InputPrompt(Config):
 
 
 class InputAnthropicApiKey(Config):
+    """
+    Your Anthropic API key used to authenticate API requests.
+    Obtain this from console.anthropic.com under API Keys.
+    Keep it private and never expose it in client-side code.
+    """
     name: Literal["inputApiKey"] = "inputApiKey"
     value: str = ""
     type: Literal["string"] = "string"
@@ -85,6 +95,11 @@ class InputAnthropicApiKey(Config):
 
 
 class InputNovaVisionApiKey(Config):
+    """
+    Your NovaVision access token used to authenticate API requests.
+    Obtain this from the NovaVision platform dashboard.
+    Keep it private and never expose it in client-side code.
+    """
     name: Literal["inputApiKey"] = "inputApiKey"
     value: str = ""
     type: Literal["string"] = "string"
@@ -100,6 +115,11 @@ class AnthropicAPIConfigs(Configs):
 
 
 class AnthropicAPIOption(Config):
+    """
+    Authenticate using your Anthropic API key.
+    Select this option if you have a credited Anthropic account.
+    Requires a valid key from console.anthropic.com.
+    """
     name: Literal["Anthropic"] = "Anthropic"
     value: AnthropicAPIConfigs
     type: Literal["object"] = "object"
@@ -107,7 +127,7 @@ class AnthropicAPIOption(Config):
 
     class Config:
         title = "Anthropic API"
-        json_schema_extra = {"target": "value"}
+        json_schema_extra = {"target": "value", "shortDescription": "Anthropic API Key"}
 
 
 class NovaVisionAPIConfigs(Configs):
@@ -115,6 +135,11 @@ class NovaVisionAPIConfigs(Configs):
 
 
 class NovaVisionOption(Config):
+    """
+    Authenticate using your NovaVision access token.
+    Select this option if you are using the NovaVision platform.
+    Requires a valid token from the NovaVision dashboard.
+    """
     name: Literal["NovaVision"] = "NovaVision"
     value: NovaVisionAPIConfigs
     type: Literal["object"] = "object"
@@ -122,7 +147,7 @@ class NovaVisionOption(Config):
 
     class Config:
         title = "NovaVision"
-        json_schema_extra = {"target": "value"}
+        json_schema_extra = {"target": "value", "shortDescription": "NovaVision Token"}
 
 
 class APIProvider(Config):
@@ -141,6 +166,11 @@ class APIProvider(Config):
 
 
 class VersionOpus46(Config):
+    """
+    Claude Opus 4.6 — the most capable model in the Claude 4 family.
+    Best for complex reasoning and nuanced visual understanding tasks.
+    Higher cost and latency compared to Sonnet and Haiku variants.
+    """
     name: Literal["claude-opus-4-6"] = "claude-opus-4-6"
     value: Literal["claude-opus-4-6"] = "claude-opus-4-6"
     type: Literal["string"] = "string"
@@ -148,9 +178,15 @@ class VersionOpus46(Config):
 
     class Config:
         title = "Claude Opus 4.6"
+        json_schema_extra = {"shortDescription": "Most capable, highest cost"}
 
 
 class VersionSonnet46(Config):
+    """
+    Claude Sonnet 4.6 — high performance with balanced speed and cost.
+    Recommended for most production use cases.
+    Good balance between capability, speed, and cost efficiency.
+    """
     name: Literal["claude-sonnet-4-6"] = "claude-sonnet-4-6"
     value: Literal["claude-sonnet-4-6"] = "claude-sonnet-4-6"
     type: Literal["string"] = "string"
@@ -158,9 +194,15 @@ class VersionSonnet46(Config):
 
     class Config:
         title = "Claude Sonnet 4.6"
+        json_schema_extra = {"shortDescription": "Balanced performance"}
 
 
 class VersionSonnet45(Config):
+    """
+    Claude Sonnet 4.5 — a previous generation Sonnet model.
+    Reliable performance for standard vision tasks.
+    Slightly lower capability than Sonnet 4.6.
+    """
     name: Literal["claude-sonnet-4-5"] = "claude-sonnet-4-5"
     value: Literal["claude-sonnet-4-5"] = "claude-sonnet-4-5"
     type: Literal["string"] = "string"
@@ -168,9 +210,15 @@ class VersionSonnet45(Config):
 
     class Config:
         title = "Claude Sonnet 4.5"
+        json_schema_extra = {"shortDescription": "Previous Sonnet generation"}
 
 
 class VersionHaiku45(Config):
+    """
+    Claude Haiku 4.5 — the fastest and most cost-effective model.
+    Ideal for high-volume, latency-sensitive workloads.
+    Lower capability than Sonnet or Opus models.
+    """
     name: Literal["claude-haiku-4-5"] = "claude-haiku-4-5"
     value: Literal["claude-haiku-4-5"] = "claude-haiku-4-5"
     type: Literal["string"] = "string"
@@ -178,9 +226,15 @@ class VersionHaiku45(Config):
 
     class Config:
         title = "Claude Haiku 4.5"
+        json_schema_extra = {"shortDescription": "Fastest, lowest cost"}
 
 
 class VersionOpus45(Config):
+    """
+    Claude Opus 4.5 — high capability from the previous Opus generation.
+    Suitable for complex tasks requiring deep visual understanding.
+    Compare with Opus 4.6 to evaluate performance differences.
+    """
     name: Literal["claude-opus-4-5"] = "claude-opus-4-5"
     value: Literal["claude-opus-4-5"] = "claude-opus-4-5"
     type: Literal["string"] = "string"
@@ -188,9 +242,15 @@ class VersionOpus45(Config):
 
     class Config:
         title = "Claude Opus 4.5"
+        json_schema_extra = {"shortDescription": "Previous Opus generation"}
 
 
 class VersionSonnet4(Config):
+    """
+    Claude Sonnet 4 — the base Sonnet model from the Claude 4 generation.
+    Suitable for general-purpose vision and language tasks.
+    A balanced option for standard production workflows.
+    """
     name: Literal["claude-sonnet-4"] = "claude-sonnet-4"
     value: Literal["claude-sonnet-4"] = "claude-sonnet-4"
     type: Literal["string"] = "string"
@@ -198,9 +258,15 @@ class VersionSonnet4(Config):
 
     class Config:
         title = "Claude Sonnet 4"
+        json_schema_extra = {"shortDescription": "Claude 4 base model"}
 
 
 class VersionOpus41(Config):
+    """
+    Claude Opus 4.1 — a high-capability model from the Opus 4.x line.
+    Good choice for demanding multi-step reasoning and vision tasks.
+    Intermediate between Opus 4 and Opus 4.5 in capability.
+    """
     name: Literal["claude-opus-4-1"] = "claude-opus-4-1"
     value: Literal["claude-opus-4-1"] = "claude-opus-4-1"
     type: Literal["string"] = "string"
@@ -208,9 +274,15 @@ class VersionOpus41(Config):
 
     class Config:
         title = "Claude Opus 4.1"
+        json_schema_extra = {"shortDescription": "High capability variant"}
 
 
 class VersionOpus4(Config):
+    """
+    Claude Opus 4 — the foundational Opus 4 generation model.
+    High capability for complex vision and reasoning tasks.
+    Baseline Opus 4 performance without later incremental improvements.
+    """
     name: Literal["claude-opus-4"] = "claude-opus-4"
     value: Literal["claude-opus-4"] = "claude-opus-4"
     type: Literal["string"] = "string"
@@ -218,6 +290,7 @@ class VersionOpus4(Config):
 
     class Config:
         title = "Claude Opus 4"
+        json_schema_extra = {"shortDescription": "Base Opus 4 model"}
 
 
 class InputModelVersion(Config):
@@ -237,6 +310,11 @@ class InputModelVersion(Config):
 
 
 class ExtendedThinkingTrue(Config):
+    """
+    Enable extended thinking mode for deeper internal reasoning.
+    The model reasons step-by-step before generating a response.
+    Increases latency and token cost; temperature must be set to 1.
+    """
     name: Literal["True"] = "True"
     value: Literal[True] = True
     type: Literal["bool"] = "bool"
@@ -244,9 +322,15 @@ class ExtendedThinkingTrue(Config):
 
     class Config:
         title = "Enable"
+        json_schema_extra = {"shortDescription": "Enable deep reasoning"}
 
 
 class ExtendedThinkingFalse(Config):
+    """
+    Disable extended thinking for standard response generation.
+    The model responds without additional internal reasoning steps.
+    Faster responses with normal token usage.
+    """
     name: Literal["False"] = "False"
     value: Literal[False] = False
     type: Literal["bool"] = "bool"
@@ -254,6 +338,7 @@ class ExtendedThinkingFalse(Config):
 
     class Config:
         title = "Disable"
+        json_schema_extra = {"shortDescription": "Standard processing"}
 
 
 class ExtendedThinking(Config):
@@ -364,6 +449,11 @@ class TextPromptResponse(Response):
 
 
 class TextPromptExecutor(Config):
+    """
+    Generates a text response based on a custom prompt.
+    No image input is required for this task.
+    Use for pure text tasks like content generation or Q&A.
+    """
     name: Literal["TextPromptExecutor"] = "TextPromptExecutor"
     value: Union[TextPromptRequest, TextPromptResponse]
     type: Literal["object"] = "object"
@@ -371,7 +461,7 @@ class TextPromptExecutor(Config):
 
     class Config:
         title = "Text Prompt"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Text-only generation"}
 
 
 class UnconstrainedConfigs(Configs):
@@ -406,6 +496,11 @@ class UnconstrainedResponse(Response):
 
 
 class UnconstrainedExecutor(Config):
+    """
+    Analyzes an image using a fully custom prompt without predefined constraints.
+    Provides maximum flexibility for open-ended visual analysis.
+    Use when no structured output format is required.
+    """
     name: Literal["UnconstrainedExecutor"] = "UnconstrainedExecutor"
     value: Union[UnconstrainedRequest, UnconstrainedResponse]
     type: Literal["object"] = "object"
@@ -413,7 +508,7 @@ class UnconstrainedExecutor(Config):
 
     class Config:
         title = "Open Prompt"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Free-form image analysis"}
 
 class OCRConfigs(Configs):
     apiProvider: APIProvider
@@ -446,6 +541,11 @@ class OCRResponse(Response):
 
 
 class OCRExecutor(Config):
+    """
+    Extracts all text present in an image using optical character recognition.
+    Returns the detected text as a plain string.
+    Works on documents, signs, labels, and handwritten content.
+    """
     name: Literal["OCRExecutor"] = "OCRExecutor"
     value: Union[OCRRequest, OCRResponse]
     type: Literal["object"] = "object"
@@ -453,7 +553,7 @@ class OCRExecutor(Config):
 
     class Config:
         title = "Text Recognition (OCR)"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Text extraction from images"}
 
 class VQAConfigs(Configs):
     inputPrompt: InputPrompt
@@ -487,6 +587,11 @@ class VQAResponse(Response):
 
 
 class VQAExecutor(Config):
+    """
+    Answers a specific question about the content of an image.
+    Provide a question as the prompt and receive a targeted answer.
+    Useful for structured visual inspection and querying.
+    """
     name: Literal["VQAExecutor"] = "VQAExecutor"
     value: Union[VQARequest, VQAResponse]
     type: Literal["object"] = "object"
@@ -494,7 +599,7 @@ class VQAExecutor(Config):
 
     class Config:
         title = "Visual Question Answering"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Image question answering"}
 
 
 
@@ -529,6 +634,11 @@ class CaptionResponse(Response):
 
 
 class CaptionExecutor(Config):
+    """
+    Generates a concise one or two sentence caption describing an image.
+    Suitable for labeling, quick summaries, or image metadata.
+    Use Detailed Captioning for richer, longer descriptions.
+    """
     name: Literal["CaptionExecutor"] = "CaptionExecutor"
     value: Union[CaptionRequest, CaptionResponse]
     type: Literal["object"] = "object"
@@ -536,7 +646,7 @@ class CaptionExecutor(Config):
 
     class Config:
         title = "Captioning (Short)"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Brief image description"}
 
 class DetailedCaptionConfigs(Configs):
     apiProvider: APIProvider
@@ -569,6 +679,11 @@ class DetailedCaptionResponse(Response):
 
 
 class DetailedCaptionExecutor(Config):
+    """
+    Generates a comprehensive multi-sentence description of an image.
+    Covers objects, attributes, spatial relationships, and scene context.
+    Use for thorough image documentation or accessibility alt-text.
+    """
     name: Literal["DetailedCaptionExecutor"] = "DetailedCaptionExecutor"
     value: Union[DetailedCaptionRequest, DetailedCaptionResponse]
     type: Literal["object"] = "object"
@@ -576,7 +691,7 @@ class DetailedCaptionExecutor(Config):
 
     class Config:
         title = "Captioning (Detailed)"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Rich image description"}
 
 
 class ClassificationConfigs(Configs):
@@ -612,6 +727,11 @@ class ClassificationResponse(Response):
 
 
 class ClassificationExecutor(Config):
+    """
+    Assigns exactly one class label from a predefined list to an image.
+    The model selects the single most appropriate class.
+    Provide the list of valid classes using the Classes config.
+    """
     name: Literal["ClassificationExecutor"] = "ClassificationExecutor"
     value: Union[ClassificationRequest, ClassificationResponse]
     type: Literal["object"] = "object"
@@ -619,7 +739,7 @@ class ClassificationExecutor(Config):
 
     class Config:
         title = "Single-Label Classification"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Single class assignment"}
 
 class MultiLabelConfigs(Configs):
     inputClasses: InputClasses
@@ -654,6 +774,11 @@ class MultiLabelResponse(Response):
 
 
 class MultiLabelExecutor(Config):
+    """
+    Assigns one or more class labels from a predefined list to an image.
+    The model selects all classes that apply to the image.
+    Provide the list of valid classes using the Classes config.
+    """
     name: Literal["MultiLabelExecutor"] = "MultiLabelExecutor"
     value: Union[MultiLabelRequest, MultiLabelResponse]
     type: Literal["object"] = "object"
@@ -661,7 +786,7 @@ class MultiLabelExecutor(Config):
 
     class Config:
         title = "Multi-Label Classification"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Multiple class assignment"}
 
 class ObjectDetectionConfigs(Configs):
     inputClasses: InputClasses
@@ -696,6 +821,11 @@ class ObjectDetectionResponse(Response):
 
 
 class ObjectDetectionExecutor(Config):
+    """
+    Detects and identifies objects in an image from a predefined class list.
+    Returns detected class names found within the image.
+    Provide the list of target classes using the Classes config.
+    """
     name: Literal["ObjectDetectionExecutor"] = "ObjectDetectionExecutor"
     value: Union[ObjectDetectionRequest, ObjectDetectionResponse]
     type: Literal["object"] = "object"
@@ -703,7 +833,7 @@ class ObjectDetectionExecutor(Config):
 
     class Config:
         title = "Object Detection"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Detect objects by class"}
 
 class StructuredAnsweringConfigs(Configs):
     inputPrompt: InputPrompt
@@ -737,6 +867,11 @@ class StructuredAnsweringResponse(Response):
 
 
 class StructuredAnsweringExecutor(Config):
+    """
+    Generates a structured output (e.g. JSON) based on a custom prompt and image.
+    Use the prompt to define the desired output schema or format.
+    Ideal for extracting structured data from visual content.
+    """
     name: Literal["StructuredAnsweringExecutor"] = "StructuredAnsweringExecutor"
     value: Union[StructuredAnsweringRequest, StructuredAnsweringResponse]
     type: Literal["object"] = "object"
@@ -744,10 +879,15 @@ class StructuredAnsweringExecutor(Config):
 
     class Config:
         title = "Structured Output Generation"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target": {"value": 0}, "shortDescription": "Structured data extraction"}
 
 
 class ConfigExecutor(Config):
+    """
+    Select the vision task to perform on the input image.
+    Each task has its own prompt, output format, and configuration options.
+    Choose the task that best matches your use case.
+    """
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[
         TextPromptExecutor,
@@ -766,6 +906,7 @@ class ConfigExecutor(Config):
 
     class Config:
         title = "Task"
+        json_schema_extra = {"shortDescription": "Select Vision Task"}
 
 
 class PackageConfigs(Configs):
