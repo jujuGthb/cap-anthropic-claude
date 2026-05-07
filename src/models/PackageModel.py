@@ -633,7 +633,7 @@ class CaptionResponse(Response):
     outputs: CaptionOutputs
 
 
-class ShortCaption(Capsule):
+class ShortCaption(Configs):
     """
     Generates a concise one or two sentence caption describing an image.
     Suitable for labeling, quick summaries, or image metadata.

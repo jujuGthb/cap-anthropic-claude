@@ -26,7 +26,7 @@ from capsules.AnthropicClaude.src.models.PackageModel import (
     Classification,
     ClassificationResponse,
     ClassificationOutputs,
-    MultiLabelExecutor,
+    MultiLabel,
     MultiLabelResponse,
     MultiLabelOutputs,
     ObjectDetection,
@@ -128,7 +128,7 @@ def build_response_multi_label(context):
     classes = Classes(value=context.claude_classes if context.claude_classes else [])
     outputs = MultiLabelOutputs(output=output, classes=classes)
     response = MultiLabelResponse(outputs=outputs)
-    executor = MultiLabelExecutor(value=response)
+    executor = MultiLabel(value=response)
     configExecutor = ConfigExecutor(value=executor)
     packageConfigs = PackageConfigs(executor=configExecutor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=packageConfigs)
